@@ -97,8 +97,10 @@ function connectWS(){
   try {
     const loc = window.location;
     const proto = (loc.protocol === "https:") ? "wss:" : "ws:";
-    const host = loc.host;  // ✅ includes hostname + port if local
+    const host = loc.host;  // ✅ يشمل المنفذ لو محلي، أو الدومين فقط على Render
     const url = `${proto}//${host}/ws`;
+    console.log("Connecting to:", url);
+
     ws = new WebSocket(url);
 
     ws.onopen = () => { 
@@ -109,11 +111,15 @@ function connectWS(){
       addMsg(e.data, "ai"); 
       speak(e.data); 
     };
+    ws.onerror = (err) => {
+      console.error("WS error:", err);
+    };
     ws.onclose = () => { 
       document.body.dataset.ws = "down"; 
       setTimeout(connectWS, 1000); 
     };
   } catch(e) {
+    console.error("connectWS exception:", e);
     addMsg("تعذر فتح قناة WebSocket. تأكد أن الخادم يعمل.", "ai");
   }
 }
