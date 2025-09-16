@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIGE v8 — Full Factory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1020; --panel:#121a2e; --ink:#ecf2ff; --muted:#9fb1d6;
+  --pri:#7c4dff; --pri-2:#00e5ff; --ok:#00c853; --warn:#ffd600; --danger:#ff5252;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 600px at 70% -10%, #13213c 0, #0b1020 60%);
+     color:var(--ink);font-family:'Cairo',system-ui}
+header{display:flex;gap:12px;align-items:center;justify-content:space-between;
+       padding:16px 20px;border-bottom:1px solid #1f2b44;background:linear-gradient(90deg,#0c1326,#0b1020)}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:12px;background:conic-gradient(from 210deg,var(--pri),var(--pri-2));
+      box-shadow:0 0 18px rgba(124,77,255,.4)}
+.title{font-weight:800;letter-spacing:.3px}
+.badge{padding:6px 12px;border-radius:999px;border:1px solid #2a3a60;background:#0e1730;color:#8ad5ff;font-weight:700}
+main{padding:20px;display:grid;gap:16px;grid-template-columns:1.4fr .6fr}
+.panel{background:linear-gradient(180deg,#121a2e,#11182a);border:1px solid #24365c;border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(8,14,30,.25)}
+.panel h2{margin:0 0 10px 0;font-size:16px;color:#d6e4ff}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+button{border:1px solid #2e3e66;background:linear-gradient(180deg,#0f1630,#0c1228);
+       color:#e9efff;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:700}
+button:hover{border-color:#3e5a95}
+#chat{height:340px;overflow:auto;background:#0e162d;border:1px solid #233457;border-radius:12px;padding:10px}
+.msg{margin:8px 0;padding:10px 12px;border-radius:12px;max-width:85%}
+.me{background:#1a2442;border:1px solid #2d3e69;align-self:flex-end}
+.ai{background:linear-gradient(180deg,#18264a,#162242);border:1px solid #2a3a60}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kpi{background:linear-gradient(180deg,#101a33,#0f182f);border:1px solid #223255;border-radius:12px;padding:10px;text-align:center}
+.kpi .v{font-size:20px;font-weight:800}
+footer{padding:14px 20px;color:var(--muted);border-top:1px solid #1f2b44}
+.video{width:100%;height:220px;background:#0e162d;border:1px solid #223255;border-radius:14px;object-fit:cover}
+input[type=text]{width:100%;padding:12px;border-radius:12px;border:1px solid #2a3a60;background:#0e162d;color:#e9efff}
+input[type=number]{width:140px;padding:10px;border-radius:10px;border:1px solid #2a3a60;background:#0e162d;color:#e9efff}
+.row{display:flex;gap:8px;align-items:center}
+.note{color:#8fb0ff;font-size:13px}
+.wsdot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-inline-start:8px;vertical-align:middle;border:1px solid #2a3a60}
+body[data-ws="up"] .wsdot{background:#00c853}
+body[data-ws="down"] .wsdot{background:#ff5252}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo"></div>
+    <div class="title">AIGE — الجيل الثامن</div>
+  </div>
+  <div class="badge">Live • Text + Voice + Cam <span class="wsdot" title="WS"></span></div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>واجهة المحادثة</h2>
+    <div id="chat" class="col"></div>
+    <div class="toolbar">
+      <input id="msg" type="text" placeholder="اكتب أمرك… ثم Enter">
+      <button id="micBtn">🎙️ تحدّث</button>
+      <button id="speakBtn">🔊 قراءة الرد</button>
+    </div>
+    <div class="note">الأوامر المقترحة: "ابدأ النشر" / "فعّل الكاميرا" / أمر حر.</div>
+  </section>
+
+  <section class="panel">
+    <h2>لوحة التحكم السريعة</h2>
+    <div class="grid">
+      <div class="kpi"><div>الحماية</div><div class="v" id="kpi-protect">مستقر</div></div>
+      <div class="kpi"><div>الانتشار</div><div class="v" id="kpi-deploy">جاهز</div></div>
+    </div>
+    <h2 style="margin-top:12px">الكاميرا</h2>
+    <video id="cam" class="video" autoplay muted playsinline></video>
+    <div class="toolbar">
+      <button id="camBtn">📸 تشغيل الكاميرا</button>
+    </div>
+    <h2 style="margin-top:12px">نشر سريع</h2>
+    <div class="row">
+      <input id="domain" type="text" placeholder="example.com">
+      <button id="deployBtn">🚀 نشر</button>
+    </div>
+    <div class="note">هذا زر جاهز للتوصيل بخط النشر الحقيقي لديك.</div>
+  </section>
+</main>
+
+<footer>مصنع AIGE يعمل محليًا — عند الضغط على "نشر" يتم تفعيل خط جاهز للتوصيل بسيرفراتك.</footer>
+
+<script>
+// WebSocket
+let ws;
+function connectWS(){
+  // Build WS URL based on current page context
+(function(){
+  try{
+    const loc = window.location;
+    const proto = (loc.protocol === "https:") ? "wss:" : "ws:";
+    const host = loc.hostname || "127.0.0.1";
+    const port = loc.port || "8000";
+    const url = `${proto}//${host}:${port}/ws`;
+    ws = new WebSocket(url);
+  }catch(e){
+    addMsg("تعذر فتح قناة WebSocket. تأكد أن الخادم يعمل.", "ai");
+  }
+})();
+
+  ws.onopen = ()=> { addMsg("AIGE متصل وجاهز.", "ai"); document.body.dataset.ws="up"; };
+  ws.onmessage = (e)=> { addMsg(e.data, "ai"); speak(e.data); };
+  ws.onclose = ()=> { document.body.dataset.ws="down"; setTimeout(connectWS, 1000); };
+}
+connectWS();
+
+const chat = document.getElementById('chat');
+const msg = document.getElementById('msg');
+const micBtn = document.getElementById('micBtn');
+const speakBtn = document.getElementById('speakBtn');
+const camBtn = document.getElementById('camBtn');
+const cam = document.getElementById('cam');
+const deployBtn = document.getElementById('deployBtn');
+const domain = document.getElementById('domain');
+
+function addMsg(text, who="me"){
+  const div = document.createElement('div');
+  div.className = 'msg ' + (who==="me" ? "me":"ai");
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+msg.addEventListener('keydown', e=>{
+  if(e.key==="Enter" && msg.value.trim()){
+    if(ws && ws.readyState===1){ ws.send(msg.value.trim()); } else { addMsg("القناة غير متصلة. شغّل الخادم ثم حدّث الصفحة.", "ai"); }
+    addMsg(msg.value.trim(), "me");
+    msg.value="";
+  }
+});
+
+// Voice: Speech-to-Text (Web Speech API)
+let rec;
+micBtn.onclick = ()=>{
+  try{
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR){ addMsg("متصفحك لا يدعم التعرف الصوتي.", "ai"); return; }
+    rec = new SR();
+    rec.lang = "ar-SA";
+    rec.onresult = (e)=>{
+      const t = e.results[0][0].transcript;
+      msg.value = t;
+      ws.send(t);
+      addMsg(t, "me");
+    };
+    rec.start();
+  }catch(e){ addMsg("تعذر تشغيل الميكروفون", "ai"); }
+};
+
+// Voice: Text-to-Speech
+function speak(text){
+  if(!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "ar-SA";
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+speakBtn.onclick = ()=>{
+  const last = [...document.querySelectorAll('.msg.ai')].pop();
+  if(last) speak(last.textContent);
+};
+
+// Camera
+camBtn.onclick = async ()=>{
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ video:true, audio:false });
+    cam.srcObject = stream;
+    addMsg("تم تشغيل الكاميرا.", "ai");
+  }catch(e){
+    addMsg("تعذر تشغيل الكاميرا.", "ai");
+  }
+};
+
+// Deploy Stub
+deployBtn.onclick = ()=>{
+  const d = domain.value.trim() || "your-domain.com";
+  addMsg(`بدء نشر المصنع إلى ${d} ...`, "me");
+  if(ws && ws.readyState===1){ ws.send("deploy " + d); } else { addMsg("القناة غير متصلة. شغّل الخادم ثم حدّث الصفحة.", "ai"); }
+};
+
+</script>
+</body>
+</html>
