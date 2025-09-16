@@ -94,23 +94,28 @@ body[data-ws="down"] .wsdot{background:#ff5252}
 // WebSocket
 let ws;
 function connectWS(){
-  // Build WS URL based on current page context
-(function(){
-  try{
+  try {
     const loc = window.location;
     const proto = (loc.protocol === "https:") ? "wss:" : "ws:";
-    const host = loc.hostname || "127.0.0.1";
-    const port = loc.port || "8000";
-    const url = `${proto}//${host}:${port}/ws`;
+    const host = loc.host;  // ✅ includes hostname + port if local
+    const url = `${proto}//${host}/ws`;
     ws = new WebSocket(url);
-  }catch(e){
+
+    ws.onopen = () => { 
+      addMsg("AIGE متصل وجاهز.", "ai"); 
+      document.body.dataset.ws = "up"; 
+    };
+    ws.onmessage = (e) => { 
+      addMsg(e.data, "ai"); 
+      speak(e.data); 
+    };
+    ws.onclose = () => { 
+      document.body.dataset.ws = "down"; 
+      setTimeout(connectWS, 1000); 
+    };
+  } catch(e) {
     addMsg("تعذر فتح قناة WebSocket. تأكد أن الخادم يعمل.", "ai");
   }
-})();
-
-  ws.onopen = ()=> { addMsg("AIGE متصل وجاهز.", "ai"); document.body.dataset.ws="up"; };
-  ws.onmessage = (e)=> { addMsg(e.data, "ai"); speak(e.data); };
-  ws.onclose = ()=> { document.body.dataset.ws="down"; setTimeout(connectWS, 1000); };
 }
 connectWS();
 
@@ -187,7 +192,6 @@ deployBtn.onclick = ()=>{
   addMsg(`بدء نشر المصنع إلى ${d} ...`, "me");
   if(ws && ws.readyState===1){ ws.send("deploy " + d); } else { addMsg("القناة غير متصلة. شغّل الخادم ثم حدّث الصفحة.", "ai"); }
 };
-
 </script>
 </body>
 </html>
