@@ -97,7 +97,7 @@ function connectWS(){
   try {
     const loc = window.location;
     const proto = (loc.protocol === "https:") ? "wss:" : "ws:";
-    const host = loc.host;  // ✅ يشمل المنفذ لو محلي، أو الدومين فقط على Render
+    const host = loc.host;  // ✅ لا تحدد المنفذ يدوياً
     const url = `${proto}//${host}/ws`;
     console.log("Connecting to:", url);
 
@@ -150,7 +150,7 @@ msg.addEventListener('keydown', e=>{
   }
 });
 
-// Voice: Speech-to-Text (Web Speech API)
+// Voice: Speech-to-Text
 let rec;
 micBtn.onclick = ()=>{
   try{
