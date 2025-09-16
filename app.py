@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 import os, asyncio, datetime
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
